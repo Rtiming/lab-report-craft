@@ -1,0 +1,167 @@
+% ============================================================
+% 实验报告通用模板 — lab-report-craft
+% 文档类: ctexart (中文 article)
+% 适用: 大学物理/近代物理/专业实验报告
+% ============================================================
+\documentclass[UTF8,a4paper,12pt]{ctexart}
+
+% ---------- 页面与段落 ----------
+\usepackage[top=2.45cm,bottom=2.45cm,left=2.55cm,right=2.55cm]{geometry}
+\linespread{1.32}
+\setlength{\parindent}{2em}
+\tolerance=1200
+\emergencystretch=3em
+
+% ---------- 数学与符号 ----------
+\usepackage{amsmath,amssymb,amsfonts}
+
+% ---------- 图表 ----------
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{caption}
+\captionsetup{font=small}
+\usepackage{float}
+
+% ---------- 列表缩进 ----------
+\usepackage{enumitem}
+\setlist[itemize]{leftmargin=2.4em}
+\setlist[enumerate]{leftmargin=2.4em}
+
+% ---------- 超链接 (打印友好) ----------
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black}
+
+% ---------- 章节样式 ----------
+\ctexset{
+  section={format=\large\bfseries, beforeskip=1.2ex, afterskip=0.8ex},
+  subsection={format=\normalsize\bfseries, beforeskip=0.8ex, afterskip=0.4ex}
+}
+
+% ============================================================
+% 封面信息 (请修改以下占位符)
+% ============================================================
+\newcommand{\reporttitle}{实验名称}
+\newcommand{\studentname}{姓名}
+\newcommand{\studentid}{学号}
+\newcommand{\department}{院系}
+\newcommand{\reportdate}{\today}
+
+\begin{document}
+
+% ---------- 封面 ----------
+\begin{titlepage}
+  \centering
+  \vspace*{2cm}
+  {\LARGE\bfseries 中国科学技术大学}\\[0.5cm]
+  {\Large 实验报告}\\[2.5cm]
+  {\Huge\bfseries \reporttitle}\\[3cm]
+  \begin{tabular}{rl}
+    \textbf{姓名:} & \studentname \\[0.3cm]
+    \textbf{学号:} & \studentid \\[0.3cm]
+    \textbf{院系:} & \department \\[0.3cm]
+    \textbf{日期:} & \reportdate \\
+  \end{tabular}
+  \vfill
+\end{titlepage}
+
+% ---------- 摘要 ----------
+\section*{摘要}
+\addcontentsline{toc}{section}{摘要}
+
+% 简明概括实验目的、方法、主要结果和结论 (200–300字)
+% 例如：本实验利用...测量了...，得到...，与标准值...一致。
+
+\vspace{0.5cm}
+\noindent\textbf{关键词：}关键词1；关键词2；关键词3
+
+% ---------- 1 实验目的 ----------
+\section{实验目的}
+
+\begin{itemize}
+  \item 目的一
+  \item 目的二
+  \item 目的三
+\end{itemize}
+
+% ---------- 2 实验原理 ----------
+\section{实验原理}
+
+% 包含公式推导、物理图像描述
+% 建议配合原理示意图 (Figure~\ref{fig:principle})
+
+\begin{equation}
+  % 主要公式
+  \label{eq:main}
+\end{equation}
+
+% ---------- 3 实验装置与内容 ----------
+\section{实验装置与内容}
+
+\subsection{实验装置}
+
+% 用表格列出主要仪器参数
+\begin{table}[H]
+  \centering
+  \caption{主要实验仪器}
+  \label{tab:instruments}
+  \begin{tabular}{lll}
+    \toprule
+    仪器名称 & 型号 & 主要参数 \\
+    \midrule
+    % 填写仪器信息
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{实验步骤}
+
+\begin{enumerate}
+  \item 步骤一
+  \item 步骤二
+  \item 步骤三
+\end{enumerate}
+
+% ---------- 4 实验结果与分析 ----------
+\section{实验结果与分析}
+
+\subsection{结果一 (如：数据处理)}
+
+% 插入图表，caption 说明数据来源和物理意义
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{figures/figure1.png}
+  \caption{图表说明。数据来源：自主测量。}
+  \label{fig:result1}
+\end{figure}
+
+\subsection{误差分析}
+
+% 定量分析误差来源：统计误差、系统误差、模型误差等
+
+% ---------- 5 结论 ----------
+\section{结论}
+
+% 总结主要定量结果，给出不确定度
+% 若有多个数据集，明确区分自主测量与参考数据
+% 指出实验的局限性与改进方向
+
+% ---------- 附录 ----------
+\newpage
+\appendix
+\section{思考题解答}
+
+% 按题目顺序给出解答
+
+\clearpage
+\section{原始数据}
+
+% 手写记录照片或完整数据表格
+
+% ---------- 参考文献 ----------
+\clearpage
+\begin{thebibliography}{99}
+\bibitem{ref1} 作者, ``标题,'' \textit{期刊名} \textbf{卷}, 页码 (年份).
+\bibitem{ref2} 机构名, ``报告标题,'' URL.
+\end{thebibliography}
+
+\end{document}
