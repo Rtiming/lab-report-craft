@@ -1,0 +1,25 @@
+# macOS
+.DS_Store
+
+# LaTeX
+*.aux
+*.log
+*.out
+*.pdf
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Results / build
+results/
+build/
+dist/
+
+# IDE
+.vscode/
+.idea/
