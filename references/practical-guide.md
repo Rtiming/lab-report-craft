@@ -315,8 +315,15 @@ plt.savefig('figure.png', dpi=300, bbox_inches='tight')
 ```
 
 **必须验证**（PDF 嵌入 LaTeX 后看起来正常 ≠ 实际渲染正确）：
+
+可用脚本：
 ```bash
-# PDF 转 PNG 查看
+python3 assets/scripts/pdf_to_png.py figure.pdf          # 单页转换
+python3 assets/scripts/pdf_to_png.py report.pdf --all-pages -o check/
+```
+
+或手动：
+```bash
 python3 -c "import fitz; doc=fitz.open('figure.pdf'); \
              doc[0].get_pixmap(dpi=200).save('check.png')"
 ```
@@ -381,6 +388,11 @@ LaTeX 中引用：
 
 % 正文中使用
 Fe 的饱和磁矩 $J_s = \valJs$ emu，矫顽力 $H_c = \valHc$ Oe。
+```
+
+**验证数值管线**：
+```bash
+python3 assets/scripts/check_numerical_pipeline.py report.tex --params results/params.tex
 ```
 
 **严禁**：
@@ -516,6 +528,16 @@ grep -o '\\cite{[^}]*}' report.tex | sort | uniq
 
 ### 4.3 从 PDF 提取图片
 
+**推荐：使用脚本**（自动处理透明通道、裁剪空白、批量输出）
+```bash
+# 提取 PDF 中所有嵌入的图片（自动处理透明通道 → 白色背景）
+python3 assets/scripts/extract_figures_from_pdf.py lecture.pdf -o assets/extracted/
+
+# 截取 PDF 页面中的 figure 区域（自动裁剪空白边距）
+python3 assets/scripts/extract_figures_from_pdf.py paper.pdf --page 3 --crop -o figure.png
+```
+
+**手动提取代码**（用于理解原理或自定义处理）：
 ```python
 import fitz
 doc = fitz.open('source.pdf')

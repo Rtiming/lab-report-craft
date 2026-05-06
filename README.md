@@ -16,6 +16,11 @@
 | `references/practical-guide.md` | 数据处理、可视化、LaTeX 排版、素材搜集、手写识别的代码示例与规范 |
 | `references/ask-user-guide.md` | 不确定时提问指南，含 16 个触发点的标准提问模板 |
 | `assets/template.tex` | 通用 ctexart 实验报告 LaTeX 模板 |
+| `assets/scripts/compile_report.py` | LaTeX 自动编译（多次编译直到交叉引用稳定） |
+| `assets/scripts/pdf_to_png.py` | PDF 转 PNG 验证（检查渲染质量） |
+| `assets/scripts/extract_figures_from_pdf.py` | 从讲义/论文 PDF 提取图片（处理透明通道） |
+| `assets/scripts/check_numerical_pipeline.py` | 扫描手动输入数值，检查数值管线完整性 |
+| `assets/scripts/validate_report.py` | 综合验证（图片存在性+数值管线+编译） |
 
 ---
 
