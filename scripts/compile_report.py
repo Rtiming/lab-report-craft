@@ -8,7 +8,6 @@
 用法:
     python3 compile_report.py report.tex
     python3 compile_report.py report.tex --clean      # 编译后清理辅助文件
-    python3 compile_report.py report.tex --watch      # 监听文件变化自动编译（需要 watchdog）
 """
 
 import argparse

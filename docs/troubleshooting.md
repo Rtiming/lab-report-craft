@@ -66,4 +66,4 @@
 
 ### Agent proofreads only text, ignoring figures
 **Cause**: Agent did not execute the page-by-page figure review checklist.  
-**Fix**: Enforce `references/checklist.md` §三 (逐页逐图逐句检查). Every figure must be converted to PNG and opened with `ReadMediaFile`.
+**Fix**: Enforce `references/checklist.md` §三 (逐页逐图逐句检查). Every figure must be converted to PNG and opened with `当前 agent 可用的图像查看工具`.

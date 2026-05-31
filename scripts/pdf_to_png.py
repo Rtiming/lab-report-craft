@@ -46,6 +46,7 @@ def pdf_page_to_png(pdf_path: Path, page_num: int = 0, dpi: int = 200, output_pa
     if output_path is None:
         stem = pdf_path.stem
         output_path = pdf_path.parent / f"{stem}_p{page_num}_{dpi}dpi.png"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
 
     pix.save(str(output_path))
     doc.close()
@@ -92,7 +93,19 @@ def main():
         output_dir = Path(args.output).resolve() if args.output else None
         pdf_all_pages_to_png(pdf_path, dpi=args.dpi, output_dir=output_dir)
     else:
-        output_path = Path(args.output).resolve() if args.output else None
+        output_path = None
+        if args.output:
+            raw_output = Path(args.output).expanduser()
+            is_dir_output = (
+                str(args.output).endswith(("/", "\\"))
+                or (raw_output.exists() and raw_output.is_dir())
+                or raw_output.suffix == ""
+            )
+            if is_dir_output:
+                output_dir = raw_output.resolve()
+                output_path = output_dir / f"{pdf_path.stem}_p{args.page}_{args.dpi}dpi.png"
+            else:
+                output_path = raw_output.resolve()
         pdf_page_to_png(pdf_path, page_num=args.page, dpi=args.dpi, output_path=output_path)
 
 

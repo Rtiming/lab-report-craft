@@ -318,8 +318,8 @@ plt.savefig('figure.png', dpi=300, bbox_inches='tight')
 
 可用脚本：
 ```bash
-python3 assets/scripts/pdf_to_png.py figure.pdf          # 单页转换
-python3 assets/scripts/pdf_to_png.py report.pdf --all-pages -o check/
+python3 scripts/pdf_to_png.py figure.pdf          # 单页转换
+python3 scripts/pdf_to_png.py report.pdf --all-pages -o check/
 ```
 
 或手动：
@@ -392,7 +392,7 @@ Fe 的饱和磁矩 $J_s = \valJs$ emu，矫顽力 $H_c = \valHc$ Oe。
 
 **验证数值管线**：
 ```bash
-python3 assets/scripts/check_numerical_pipeline.py report.tex --params results/params.tex
+python3 scripts/check_numerical_pipeline.py report.tex --params results/params.tex
 ```
 
 **严禁**：
@@ -531,10 +531,10 @@ grep -o '\\cite{[^}]*}' report.tex | sort | uniq
 **推荐：使用脚本**（自动处理透明通道、裁剪空白、批量输出）
 ```bash
 # 提取 PDF 中所有嵌入的图片（自动处理透明通道 → 白色背景）
-python3 assets/scripts/extract_figures_from_pdf.py lecture.pdf -o assets/extracted/
+python3 scripts/extract_figures_from_pdf.py lecture.pdf -o assets/extracted/
 
 # 截取 PDF 页面中的 figure 区域（自动裁剪空白边距）
-python3 assets/scripts/extract_figures_from_pdf.py paper.pdf --page 3 --crop -o figure.png
+python3 scripts/extract_figures_from_pdf.py paper.pdf --page 3 --crop -o figure.png
 ```
 
 **手动提取代码**（用于理解原理或自定义处理）：
@@ -574,8 +574,11 @@ cropped = img[y:y+h, x:x+w]
 ## 5. 快速命令索引
 
 ```bash
+# 初始化 workflow evidence 模板
+python3 scripts/audit_workflow_evidence.py --init report.tex
+
 # LaTeX 编译
-xelatex -interaction=nonstopmode report.tex
+python3 scripts/compile_report.py report.tex --verbose
 
 # 提取 PDF 文本
 pdftotext report.pdf - | head -n 100
@@ -584,11 +587,19 @@ pdftotext report.pdf - | head -n 100
 grep -o '\\cite{[^}]*}' report.tex | sort | uniq
 
 # PDF 图转 PNG 查看
-python3 -c "import fitz; doc=fitz.open('figure.pdf'); \
-             doc[0].get_pixmap(dpi=200).save('check.png')"
+python3 scripts/pdf_to_png.py figure.pdf
 
 # 检查 overfull hbox
 grep -i "overfull" report.log
+
+# 检查数值管线
+python3 scripts/check_numerical_pipeline.py report.tex --params results/params.tex
+
+# 检查八阶段流程证据
+python3 scripts/audit_workflow_evidence.py report.tex
+
+# 综合验证（图片引用 + 数值管线 + 编译 + workflow evidence）
+python3 scripts/validate_report.py report.tex
 
 # 统计字数
 pdftotext report.pdf - | wc -m

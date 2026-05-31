@@ -20,8 +20,24 @@ description: >
 **核心原则**：
 1. **讲义驱动**——实验讲义的明确要求是最高准则
 2. **全局返工**——发现问题时回到源头阶段重新执行，不是单步修补
-3. **不确定时提问**——遇到任何模糊、不确定、与讲义不一致的内容时，**必须停下来向用户提问确认**，提供选项供用户选择，**严禁自行推测或编造**
+3. **不确定时分级处理**——阻塞级不确定必须停下来向用户确认；偏好级不确定可先给推荐默认方案并记录假设
 4. **预防胜于检查**——写的时候就对，不要指望审校来兜底
+
+---
+
+## 任务模式
+
+先判断用户请求属于哪种模式，再决定执行范围：
+
+| 模式 | 适用场景 | 必跑门禁 |
+|------|----------|----------|
+| `full-report` | 从讲义和数据生成完整实验报告 | 阶段0-8全部执行 |
+| `final-submit` | 用户要求交付最终 PDF 或提交前检查 | `compile_report.py`、`check_numerical_pipeline.py --strict`、`audit_workflow_evidence.py`、`validate_report.py` 全部通过 |
+| `repair-only` | 只修编译错误、图表问题、局部文字或单个脚本 | 只跑与修改范围直接相关的检查；不强制教师评审 |
+| `figure-only` | 只提取、生成或检查图片 | 转 PNG 后用当前 agent 可用的图像查看工具直接打开验证 |
+| `audit-only` | 只做质量检查或提交前审阅 | 按用户要求选择数值、图像、编译、workflow evidence 检查 |
+
+若用户没有明确要求最终提交，默认不要强制执行 `final-submit` 门禁；但必须说明尚未完成最终交付级验证。
 
 ---
 
@@ -40,7 +56,7 @@ description: >
                   输出数值管线文件（params.tex）供 LaTeX 引用
                   【不确定时提问：拟合模型？误差处理？结果异常？】
 阶段4 可视化    → 根据数据特点选择图表类型
-                  生成后强制验证：转 PNG 用 ReadMediaFile 直接查看
+                  生成后强制验证：转 PNG 后用可用图像查看工具直接查看
                   【不确定时提问：图表类型？参数框位置？】
 阶段5 素材搜集  → 从常用靠谱来源搜集，规范标注版权
                   【不确定时提问：图片来源？标准值来源？】
@@ -49,8 +65,9 @@ description: >
                   分步写作+即时自检：每段/每图写完后立即检查
                   【不确定时提问：仪器型号？样品参数？步骤细节？】
 阶段7 校对迭代  → 七维排查（粗筛）+ 逐页逐图逐句检查（精筛）
+                  维护 workflow_evidence.json；所有口头检查必须落到证据文件
                   【不确定时提问：数据不一致？与讲义不符？】
-阶段8 最终交付  → 输出 PDF
+阶段8 最终交付  → validate_report.py + workflow evidence 门禁通过后输出 PDF
 ```
 
 ---
@@ -105,13 +122,14 @@ description: >
 **不强制任何图表类型。** 根据数据特点选择（散点图、直方图、双面板、多子图、柱状图等）。
 通用规范：参数框/图例不与数据重叠、数学符号用 LaTeX、**优先矢量图（PDF）**、位图 300 DPI。
 
-**生成后强制验证**：将输出的 PDF/PNG 图片转换为可读格式，用 `ReadMediaFile` 直接查看，确认无乱码、无重叠、无截断。不能仅通过 report PDF 的缩略图判断。
+**生成后强制验证**：将输出的 PDF/PNG 图片转换为可读格式，用当前 agent 可用的图像查看工具直接打开，确认无乱码、无重叠、无截断。不能仅通过 report PDF 的缩略图判断。
 
-可用脚本: `assets/scripts/pdf_to_png.py`
+可用脚本: `scripts/pdf_to_png.py`
 
-**【不确定时提问】**
-- 图表类型不确定 → 提供选项让用户选择
-- 参数框位置可能重叠 → 提供选项让用户选择
+**【不确定时处理】**
+- 图表类型会影响结论表达 → 提供选项让用户选择
+- 仅为展示偏好 → 先选择最清晰方案并记录理由
+- 参数框位置可能重叠 → 先自动避障；仍不确定时再提问
 
 ### 阶段5：素材搜集
 从常用靠谱来源（权威机构教育页、PDG/CODATA/NIST、学术搜索引擎等）搜集原理图和标准值。
@@ -123,7 +141,7 @@ description: >
 3. 裁剪后必须人工/工具验证：图中是否混入了不属于该图的文字？是否有截断的公式？
 4. 如无法获得干净的独立图，宁可不用该图，换来源或向用户说明
 
-可用脚本: `assets/scripts/extract_figures_from_pdf.py`（提取嵌入图片 + 页面裁剪 + 透明通道处理）
+可用脚本: `scripts/extract_figures_from_pdf.py`（提取嵌入图片 + 页面裁剪 + 透明通道处理）
 
 **【不确定时提问】**
 - 原理图来源不确定 → 询问用户是否有指定来源
@@ -136,7 +154,7 @@ description: >
 #### 数值管线原则（铁律）
 **正文中出现的每一个数值，必须来自脚本输出的唯一来源。** 通过 `\input{results/params.tex}` 或 `\newcommand` 自动填充，**严禁手动输入任何数值**。
 
-可用脚本: `assets/scripts/check_numerical_pipeline.py`（扫描手动输入数值，与 params.tex 交叉验证）
+可用脚本: `scripts/check_numerical_pipeline.py`（扫描手动输入数值，与 params.tex 交叉验证）
 
 #### 分步写作 + 即时自检
 不要一次性写完所有内容再检查。每写完一个模块，立即执行自检：
@@ -160,7 +178,23 @@ description: >
 
 **七维排查是粗筛，逐页逐图逐句检查是精筛。必须全部执行，不能跳过。**
 
-可用脚本: `assets/scripts/validate_report.py`（一键检查图片存在性 + 数值管线 + 编译测试）
+可用脚本: `scripts/validate_report.py`（一键检查图片存在性 + 数值管线 + 编译测试 + workflow evidence 门禁）
+
+#### 7.0 Workflow evidence 门禁
+在阶段7开始前创建 `results/workflow_evidence.json`：
+
+```bash
+python3 scripts/audit_workflow_evidence.py --init report.tex
+```
+
+每完成一个阶段，更新 `workflow_evidence.json` 中对应 `stage_evidence`，并指向实际证据文件（如 `results/requirements_checklist.md`、`results/data_review.md`、`reviews/self_review.md`、`reviews/teacher_review.md`）。**禁止只写"已检查"而没有文件证据。**
+
+阶段8前必须通过：
+
+```bash
+python3 scripts/audit_workflow_evidence.py report.tex
+python3 scripts/validate_report.py report.tex
+```
 
 #### 7.1 七维排查（快速扫描）
 数据一致性、讲义符合性、措辞规范、排版质量、图表质量、逐页检查、参考文献。
@@ -169,7 +203,7 @@ description: >
 检查页码连续性、章节编号正确性、内容完整性、排版细节。
 
 #### 7.3 逐图检查（对每一个图执行）
-**必须直接查看图片文件**（转 PNG 用 ReadMediaFile），不能仅看 PDF 缩略图。
+**必须直接查看图片文件**（PDF 先转 PNG，再用当前 agent 可用的图像查看工具打开），不能仅看 PDF 缩略图。
 检查来源合法性、渲染质量（无乱码/重叠/截断）、与正文一致性、物理正确性。
 
 #### 7.4 逐句检查（对关键段落执行）
@@ -205,23 +239,31 @@ description: >
 - 发现与讲义要求不符 → 询问用户如何修改
 
 ### 阶段8：最终交付
-输出最终 PDF。
+只有在以下检查全部通过后才能输出最终 PDF：
+- `compile_report.py` 编译成功
+- `check_numerical_pipeline.py` 无高风险手动数值
+- `audit_workflow_evidence.py` 通过，确认八阶段证据、逐图直接查看、未解决问题清零、教师评审关闭
+- `validate_report.py` 通过
 
-可用脚本: `assets/scripts/compile_report.py`（自动多次编译直到交叉引用稳定，格式化错误/警告输出）
+可用脚本: `scripts/compile_report.py`（自动多次编译直到交叉引用稳定，格式化错误/警告输出）
 
 ---
 
 ## 不确定时提问规则
 
-**必须提问的场景**（严禁自行决定）：
+**阻塞级必须提问的场景**（严禁自行决定）：
 - 仪器型号与讲义不一致
 - 讲义未明确数据处理方法
 - 数据出现异常值
 - 样品参数在多个来源不一致
-- 图表类型不确定
 - 发现数据不一致
 - 手写数据识别存疑
 - 任何与实验讲义有出入的地方
+
+**偏好级可先默认处理的场景**：
+- 图表类型不确定但讲义无硬性要求：选择最清晰的图表类型，在报告或记录中说明理由
+- 参数框/图例位置不确定：先自动避障，若仍可能遮挡再询问
+- 参考图片来源有多个可接受候选：优先讲义/课程材料，其次权威机构或教材来源，并记录来源
 
 **提问模板要求**：
 1. 清楚说明为什么需要提问
@@ -238,6 +280,7 @@ description: >
 | 文件 | 内容 | 何时读取 |
 |------|------|---------|
 | `assets/template.tex` | 通用 ctexart 实验报告 LaTeX 模板 | 阶段6 |
+| `scripts/audit_workflow_evidence.py` | 八阶段证据门禁，约束 agent 不能跳过逐图/教师评审/用户确认 | 阶段7/8 |
 | `references/workflow.md` | 八阶段工作流详解 + 所有提问触发点模板 | 全程 |
 | `references/checklist.md` | 写作自检 + 七维排查 + 逐页逐图逐句 + 教师评审 | 阶段6/7 |
 | `references/practical-guide.md` | 数据处理 + 可视化 + LaTeX排版 + 素材搜集 + 手写识别 | 阶段2-6 |

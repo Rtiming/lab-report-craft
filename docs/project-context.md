@@ -14,14 +14,15 @@ Students write many of these reports. The work is repetitive yet error-prone:
 
 ## Why This Skill Exists
 
-This skill was created and validated in the Kimi Code environment. It encodes lessons learned from repeated report-writing cycles into a **systematic workflow** that catches errors at the source rather than after completion.
+This skill was created from repeated AI-assisted lab-report-writing cycles and is intended to run across Codex, Claude Code, and Kimi Code. It encodes lessons learned from those cycles into a **systematic workflow** that catches errors at the source rather than after completion.
 
 The core philosophy is **prevention over inspection**: build correctness into each stage so that late-stage review becomes confirmation, not repair.
 
 ## Target Environment
 
-- **Primary**: Kimi Code (long-output, low-cost LLM environment)
-- **Model characteristics**: Large per-generation token budget, sufficient context for full lecture + all data + multi-round review, but occasional low-level reasoning and coding errors
+- **Primary**: Any agent that can read files, run Python/LaTeX scripts, and visually inspect rendered images
+- **Known consumers**: Codex, Claude Code, Kimi Code
+- **Model characteristics**: Large context and long outputs help full-report generation, but all agents can still make low-level reasoning, transcription, plotting, and copy-paste errors
 - **Compensation strategy**: Process redundancy and forced validation (numerical pipeline, cross-verification, page-by-page review)
 
 ## Users
@@ -29,7 +30,7 @@ The core philosophy is **prevention over inspection**: build correctness into ea
 | User | How they interact |
 |------|-------------------|
 | Student | Provides lecture PDF, data files, and optional template path. Issues a single command. Reviews AI output and answers clarification questions. |
-| AI Agent (Kimi Code) | Loads `SKILL.md`, executes eight-stage workflow, consults `references/` as needed, asks user when uncertain. |
+| AI Agent | Loads `SKILL.md`, chooses the task mode, consults `references/` as needed, asks user when uncertainty is blocking. |
 | Future maintainer | Edits skill files to improve workflow, add scripts, or fix patterns. Reads `AGENTS.md` first. |
 
 ## Success Criteria
